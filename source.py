@@ -51,21 +51,35 @@ class MarketPlace:
 	# agent wants to trade services in next matching 
 	# roud of the market
 	def enter_market(self, agent, want, offer):
-		self.graph.append(agent, want, offer)
+		uid = agent.get_UID()
+		self.graph.append(uid, want, offer)
 
 	# agent no longer wants to trade in next matching
 	# round of the market
 	def leave_market(self, agent, want, offer):
 
-	# order the preferences for an agent who wants the desiredSkill
-	# based on ratings of users in marketplace offering that skill
-	# and the age of the user in the marketplace
-	def order_preferences(desiredSkill):
+	# order the agents offering the same skill based on their ratings
+	# best to worst
+	# dict of string:list = {skill: [agents UIDs ordered best to worst rating]}
+	def rank_agents(desiredSkill):
+		skill_to_ordering = {}
 
 
 	# call to make a TTC matching on existing agents in graph so far
 	# clear out matched agents from graph
-	def make_match(self, agents, items, agentPreferences, initialOwnership):
+	def make_match(self):
+		# list of UIDs of participating agents
+		participatingAgents = [x[0] for x in self.graph]
+		# dict of {offerdSkills:agents}
+		initialOwnership = {}
+		for node in self.graph:
+			initialOwnership[node[2]] = node[0]
+		# agentPreferences is a dictionary with keys being agents and values being
+		# lists that are permutations of the list of all houses.
+		agentPreferences = {}
+
+		alloc = topTradingCycles(participatingAgents, skills, agentPreferences, initialOwnership)
+
 
 
 
