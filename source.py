@@ -20,6 +20,9 @@ class Agent:
 		# dict of skill:rating (out of 5)
 		self.skills = {}
 
+	def get_UID(self):
+		return self.UID
+
 	# add skill to this agent's portfolio
 	def add_skill(self, skill):
 		if skill in skillDict:
@@ -38,12 +41,25 @@ class MarketPlace:
 	def __init__(self):
 		# list of (agent, want, offer)
 		self.graph = []
+		# dict of agent's UID: agent object
+		self.agents = {}
 
+	def register_agent(self, agent):
+		uid = agent.get_UID()
+		self.agents[uid] = agent
+
+	# agent wants to trade services in next matching 
+	# roud of the market
 	def enter_market(self, agent, want, offer):
 		self.graph.append(agent, want, offer)
 
+	# agent no longer wants to trade in next matching
+	# round of the market
 	def leave_market(self, agent, want, offer):
 
+	# order the preferences for an agent who wants the desiredSkill
+	# based on ratings of users in marketplace offering that skill
+	# and the age of the user in the marketplace
 	def order_preferences(desiredSkill):
 
 
