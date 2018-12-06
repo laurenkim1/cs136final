@@ -1,4 +1,5 @@
 from graph import *
+import operator
 
 
 # just to make sure skill listings are standardized
@@ -30,6 +31,10 @@ class Agent:
 				# (rating, number of ratings)
 				self.skills[skill] = (5.0, 1)
 
+	def get_skill_rating(self, skill):
+		if skill in self.skills:
+			return self.skills[skill]
+
 	# update skill rating
 	def update_skill(self, skill, newRating):
 		if skill in self.skills:
@@ -49,10 +54,12 @@ class MarketPlace:
 		self.agents[uid] = agent
 
 	# agent wants to trade services in next matching 
-	# roud of the market
+	# round of the market
 	def enter_market(self, agent, want, offer):
 		uid = agent.get_UID()
-		self.graph.append(uid, want, offer)
+		# check agent has the skill he offers
+		if offer in agent.skills:
+			self.graph.append(uid, want, offer)
 
 	# agent no longer wants to trade in next matching
 	# round of the market
@@ -61,23 +68,44 @@ class MarketPlace:
 	# order the agents offering the same skill based on their ratings
 	# best to worst
 	# dict of string:list = {skill: [agents UIDs ordered best to worst rating]}
-	def rank_agents(desiredSkill):
-		skill_to_ordering = {}
+	def rank_agents():
+		desiredSkills = set([x[1] for x in self.graph])
+		skillToOrdering = {}
+		for skill in desiredSkills:
+			agents = []
+			for node in self.graph:
+				if node[2] = skill:
+					uid = agent.get_UID()
+					rating = agent.get_skill_rating(skill)
+					agents.append(uid, rating)
+			agents.sort(operator.itemgetter(1), reverse=True)
+			skillToOrdering[skill] = agents
+		return skill_to_ordering
 
 
 	# call to make a TTC matching on existing agents in graph so far
 	# return allocation and
 	# clear out matched agents from graph
 	def make_match(self):
+		# dict of string:list = {skill: [agents UIDs ordered best to worst rating]}
+		skillToOrdering = self.rank_agents()
 		# list of UIDs of participating agents
 		participatingAgents = [x[0] for x in self.graph]
-		# dict of {offerdSkills:agents}
+		# dict of {offeredSkills:agents}
 		initialOwnership = {}
 		for node in self.graph:
-			initialOwnership[node[2]] = node[0]
+			offeredSkillRank = skillToOrdering[node[2]].index(node[0])
+			# if agent "1" is 3rd best at "Python" then
+			# uniqueRankedSkill = "Python2" (because index 2)
+			uniqueRankedSkill = node[2]+str(offeredSkillRank)
+			# "Python2": "1"
+			initialOwnership[uniqueRankedSkill] = node[0]
+
 		# agentPreferences is a dictionary with keys being agents and values being
 		# lists that are permutations of the list of all houses.
 		agentPreferences = {}
+		for node in self.graph:
+			agentPreferences[node[0]] = 
 
 		alloc = topTradingCycles(participatingAgents, skills, agentPreferences, initialOwnership)
 
