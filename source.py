@@ -80,7 +80,7 @@ class MarketPlace:
 					agents.append(uid, rating)
 			agents.sort(operator.itemgetter(1), reverse=True)
 			skillToOrdering[skill] = agents
-		return skill_to_ordering
+		return skillToOrdering
 
 
 	# call to make a TTC matching on existing agents in graph so far
@@ -91,21 +91,18 @@ class MarketPlace:
 		skillToOrdering = self.rank_agents()
 		# list of UIDs of participating agents
 		participatingAgents = [x[0] for x in self.graph]
-		# dict of {offeredSkills:agents}
+		# dict of {agent UIDs:agent UIDs}
 		initialOwnership = {}
 		for node in self.graph:
-			offeredSkillRank = skillToOrdering[node[2]].index(node[0])
-			# if agent "1" is 3rd best at "Python" then
-			# uniqueRankedSkill = "Python2" (because index 2)
-			uniqueRankedSkill = node[2]+str(offeredSkillRank)
-			# "Python2": "1"
-			initialOwnership[uniqueRankedSkill] = node[0]
+			initialOwnership[node[0]] = node[0]
 
 		# agentPreferences is a dictionary with keys being agents and values being
 		# lists that are permutations of the list of all houses.
 		agentPreferences = {}
 		for node in self.graph:
-			agentPreferences[node[0]] = 
+			desiredSkill = node[1]
+			agentPreferences[node[0]] = skillToOrdering[desiredSkill]
+			#### need to make prefer self after skillToOrdering and then the rest of agents in any order
 
 		alloc = topTradingCycles(participatingAgents, skills, agentPreferences, initialOwnership)
 
