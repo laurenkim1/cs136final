@@ -1,7 +1,7 @@
 from graph import *
 
 
-
+# just to make sure skill listings are standardized
 skillDict = {
 	"Money": "Money",
 	"Python": "Python",
@@ -15,7 +15,9 @@ skillDict = {
 class Agent:
 	def __init__(self, uid):
 		self.UID = uid
+		# time in marketplace - for ratings
 		self.age = 0.0
+		# dict of skill:rating (out of 5)
 		self.skills = {}
 
 	# add skill to this agent's portfolio
@@ -53,6 +55,7 @@ class MarketPlace:
 
 
 ########################
+# TTC stuff
 # following code from: https://github.com/j2kun/top-trading-cycles/blob/master/toptradingcycles.py
 ########################
 
