@@ -66,6 +66,7 @@ class MarketPlace:
 
 
 	# call to make a TTC matching on existing agents in graph so far
+	# return allocation and
 	# clear out matched agents from graph
 	def make_match(self):
 		# list of UIDs of participating agents
@@ -79,8 +80,6 @@ class MarketPlace:
 		agentPreferences = {}
 
 		alloc = topTradingCycles(participatingAgents, skills, agentPreferences, initialOwnership)
-
-
 
 
 
