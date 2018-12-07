@@ -135,15 +135,17 @@ class MarketPlace:
 			agentPrefOrdering.append((node[0], (5.0,1)))
 			agentPreferences[node[0]] = agentPrefOrdering
 
-		offeredSkills = {list(set(x[2] for x in self.graph))}
+		offeredSkills = {}
+		for node in self.graph:
+			offeredSkills[node[0]] = node[2]
 
-		alloc = topTradingCycles(participatingAgents, offeredSkills, agentPreferences, initialOwnership)
+		return topTradingCycles(participatingAgents, offeredSkills, agentPreferences, initialOwnership)
 
 
 
 ########################
-# TTC stuff
-# following code from: https://github.com/j2kun/top-trading-cycles/blob/master/toptradingcycles.py
+# TTC stuff. Modified code from:
+# https://github.com/j2kun/top-trading-cycles/blob/master/toptradingcycles.py
 ########################
 
 # getAgents: graph, vertex -> set(vertex)
@@ -187,7 +189,7 @@ def anyCycle(G):
 def topTradingCycles(agents, houses, agentPreferences, initialOwnership):
    # form the initial graph
    agents = set(agents)
-   vertexSet = set(agents) | set(houses)
+   vertexSet = set(agents)
    G = Graph(vertexSet)
 
    # maps agent to an index of the list agentPreferences[agent]
@@ -195,16 +197,11 @@ def topTradingCycles(agents, houses, agentPreferences, initialOwnership):
    for a in agents:
        currentPreferenceIndex[a] = 0
 
-   preferredHouse = lambda a: agentPreferences[a][currentPreferenceIndex[a]]
+   preferredAgent = lambda a: agentPreferences[a][currentPreferenceIndex[a]][0]
 
    for a in agents:
-   	(house_id, rating) = preferredHouse(a)
-   	G.addEdge(a, house_id)
-   	
-   for h in houses:
-   	  owners = initialOwnership[h]
-   	  for i in range(len(owners)):
-   	  	G.addEdge(h, owners[i])
+    # add an edge to agent's most desired peer to complete task
+   	G.addEdge(a, preferredAgent(a))
 
    # iteratively remove top trading cycles
    allocation = dict()
@@ -215,22 +212,20 @@ def topTradingCycles(agents, houses, agentPreferences, initialOwnership):
 
       # assign agents in the cycle their house
       for a in cycleAgents:
-         h = a.anyNext().vertexId
-         allocation[a.vertexId] = h
-         if a.vertexId != h:
+         assigned_agent = a.anyNext().vertexId
+         allocation[a.vertexId] = assigned_agent
+         if a.vertexId != assigned_agent:
          	num_exchanges += 1
          G.delete(a)
-         if initialOwnership[h]
-         G.delete(h)
 
       for a in agents:
          if a in G.vertices and G[a].outdegree() == 0:
-            while preferredHouse(a) not in G.vertices:
+            while preferredAgent(a) not in G.vertices:
                currentPreferenceIndex[a] += 1
-            G.addEdge(a, preferredHouse(a))
+            G.addEdge(a, preferredAgent(a))
 
    print "exchanges: ", num_exchanges
-   return allocation
+   return (num_exchanges, allocation)
 
 
 def main():
@@ -274,6 +269,33 @@ def main():
 	# once all agents registered, run TTC
 	mkt.make_match()
 
+
+def test_1():
+	# initialize market
+	mkt = MarketPlace()
+
+	# initialize 2 agents
+	agent_1 = Agent(0)
+	agent_1.add_skill(1)
+	mkt.register_agent(agent_1)
+
+	agent_2 = Agent(1)
+	agent_2.add_skill(2)
+	mkt.register_agent(agent_2)
+
+	mkt.enter_market(agent_1, 2, 1)
+	mkt.enter_market(agent_2, 1, 2)
+
+	print "Agent 1 wants 2, offers 1. Agent 2 wants 1, offers 2."
+	print "Expecting 1 exchange..."
+
+	# once all agents registered, run TTC
+	(num_exchanges, alloc) = mkt.make_match()
+
+	if not num_exchanges == 1:
+		raise AssertionError()
+
+test_1()
 main()
 
 
